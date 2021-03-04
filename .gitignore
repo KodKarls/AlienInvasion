@@ -1,0 +1,5 @@
+# Ustawienia programu Visual Studio Code
+.vscode/
+
+# Pliki konsolidacji plików pythona
+__pycache__
