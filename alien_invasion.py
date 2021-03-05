@@ -20,9 +20,6 @@ class AlienInvasion():
 
         self.ship = Ship(self)
 
-        # Zdefiniowanie koloru tła
-        self.background_color = ( 230, 230, 230 )
-
     def run_game(self):
         """Rozpoczęcie pętli głównej gry."""
         while True:
