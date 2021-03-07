@@ -4,6 +4,7 @@ import pygame
 
 from settings import Settings
 from ship import Ship
+from bullet import Bullet
 
 class AlienInvasion():
     """Ogólna klasa przeznaczona do zarządzania zasobami i
@@ -20,12 +21,20 @@ class AlienInvasion():
         pygame.display.set_caption("Inwazja obcych")
 
         self.ship = Ship(self)
+        self.bullets = pygame.sprite.Group()
 
     def run_game(self):
         """Rozpoczęcie pętli głównej gry."""
         while True:
             self._check_events()
             self.ship.update()
+            self.bullets.update()
+
+            # Usunięcie pocisków, które znajdują się poza ekranem
+            for bullet in self.bullets.copy():
+                if bullet.rect.bottom <= 0:
+                    self.bullets.remove(bullet)
+
             self._update_screen()
 
     def _check_events(self):
@@ -46,6 +55,8 @@ class AlienInvasion():
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
             sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
 
     def _check_keyup_events(self, event):
         """Reakcja na zwolnienie klawisza."""
@@ -54,10 +65,18 @@ class AlienInvasion():
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
 
+    def _fire_bullet(self):
+        """Utworzenie nowego pocisku i dodanie go do grupy pocisków"""
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
     def _update_screen(self):
         """Uaktualnienie obrazów na ekranie i przejście do nowego ekranu."""
         self.screen.fill(self.settings.background_color)
         self.ship.blitme()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
 
         # Wyświetlenie ostatnio zmodyfikowanego ekranu.
         pygame.display.flip()
