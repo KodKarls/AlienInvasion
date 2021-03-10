@@ -9,7 +9,7 @@ class Settings():
         self.background_color = (230, 230, 230)
 
         # Ustawienia dotyczące statku.
-        self.ship_speed = 1.0
+        self.ship_speed = 1.5
 
         # Ustawienia dotyczące pocisku.
         self.bullet_speed = 1.0
