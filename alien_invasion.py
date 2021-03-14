@@ -5,6 +5,7 @@ import pygame
 
 from settings import Settings
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 from ship import Ship
 from bullet import Bullet
@@ -24,8 +25,10 @@ class AlienInvasion():
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Inwazja obcych")
 
-        # Utworzenie egzemplarza przechowującego dane statystyczne dotyczące gry.
+        # Utworzenie egzemplarza przechowującego dane statystyczne dotyczące gry
+        # oraz utworzenie egemplarza klasy Scoreboard.
         self.stats = GameStats(self)
+        self.scoreboard = Scoreboard(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -72,6 +75,7 @@ class AlienInvasion():
             # Wyzerowanie danych statystycznych gry.
             self.stats.reset_stats()
             self.stats.game_active = True
+            self.scoreboard.prep_score()
 
             # Usunięcie zawartości list aliens i bullets.
             self.aliens.empty()
@@ -125,6 +129,12 @@ class AlienInvasion():
         """Reakcja na kolizję między pociskiem i obcym."""
         # Usunięcie wszystkich pocisków i obcych, między którymi doszło do kolizji.
         collisions = pygame.sprite.groupcollide( self.bullets, self.aliens, True, True )
+
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
+            self.scoreboard.prep_score()
+            self.scoreboard.check_high_score()
 
         if not self.aliens:
             # Usunięcie istniejących pocisków, przyśpieszenie gry i utworzenie nowej floty.
@@ -225,6 +235,9 @@ class AlienInvasion():
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
+
+        # Wyświetlenie informacji o punktacji.
+        self.scoreboard.show_score()
 
         # Wyświetlenie przycisku tylko wtedy, gdy gra jest nieaktywna
         if not self.stats.game_active:
