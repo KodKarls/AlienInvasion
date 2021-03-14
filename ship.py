@@ -1,10 +1,12 @@
 import pygame
+from pygame.sprite import Sprite
 
-class Ship():
+class Ship(Sprite):
     """Klasa przeznaczona do zarządzania statkiem kosmicznym."""
+
     def __init__(self, alien_invasion_game):
         """Inicjalizacja statku kosmicznego i jego położenie początkowe."""
-
+        super().__init__()
         self.screen = alien_invasion_game.screen
         self.setting = alien_invasion_game.settings
         self.screen_rect = alien_invasion_game.screen.get_rect()
@@ -23,7 +25,7 @@ class Ship():
         self.moving_right = False
         self.moving_left = False
 
-    def update(self):
+    def update(self, *args, **kwargs):
         """Uaktualnienie położenia statku na podstawie opcji wskazującejna
         na jego ruch."""
         # Uaktuanienie wartości współrzędnej X statku, a nie jego prostokąta.

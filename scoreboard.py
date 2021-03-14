@@ -1,10 +1,14 @@
 import pygame.font
+from pygame.sprite import Group
+
+from ship import Ship
 
 class Scoreboard():
     """Klasa przeznaczona do przedstawiania informacji o punktacji."""
 
     def __init__(self, alien_invasion_game):
         """Inicjalizacja atrybutów dotyczących punktacji."""
+        self.alien_invasion_game = alien_invasion_game
         self.screen = alien_invasion_game.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = alien_invasion_game.settings
@@ -18,6 +22,7 @@ class Scoreboard():
         self.prep_score()
         self.prep_high_score()
         self.prep_level()
+        self.prep_ships()
 
     def prep_score(self):
         """Przekształcenie punktacji na wygenerowany obraz."""
@@ -54,6 +59,15 @@ class Scoreboard():
         self.level_rect.right = self.score_rect.right
         self.level_rect.top = self.score_rect.bottom + 10
 
+    def prep_ships(self):
+        """Wyświetla liczbę statków, jakie pozostały graczowi."""
+        self.ships = Group()
+        for ship_number in range(self.stats.ships_left):
+            ship = Ship(self.alien_invasion_game)
+            ship.rect.x = 10 + ship_number * ship.rect.width
+            ship.rect.y = 10
+            self.ships.add(ship)
+
     def check_high_score(self):
         """Sprawdzenie, czy mamy nowy najlepszy wynik osiągnięty dotąd w grze."""
         if self.stats.score > self.stats.high_score:
@@ -61,7 +75,8 @@ class Scoreboard():
             self.prep_high_score()
 
     def show_score(self):
-        """Wyświetlenie na ekranie punktacji i poziomu."""
+        """Wyświetlenie na ekranie punktacji, poziomu oraz pozostałych żyć statku."""
         self.screen.blit(self.score_image, self.score_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
         self.screen.blit(self.level_image, self.level_rect)
+        self.ships.draw(self.screen)
