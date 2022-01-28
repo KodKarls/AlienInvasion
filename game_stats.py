@@ -1,3 +1,5 @@
+from utils.file_manager import FileManager
+
 class GameStats():
     """Monitorowanie danych statystycznych w grze "Inwazja obcych"."""
 
@@ -9,8 +11,11 @@ class GameStats():
         # Uruchomienie gry "Inwazja obcych" w stanie aktywnym.
         self.game_active = False
 
-        # Najlepszy wynik nigdy nie powinien zostać wyzerowany.
-        self.high_score = 0
+        # Creating the file manager.
+        self.file_manager = FileManager()
+
+        # Load best score from file.
+        self.high_score = self.file_manager.load_data()
 
     def reset_stats(self):
         """ Inicjalizacja danych statystycznych, które mogą zmieniać

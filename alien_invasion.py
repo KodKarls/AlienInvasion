@@ -11,6 +11,8 @@ from ship import Ship
 from bullet import Bullet
 from alien import Alien
 
+from utils.file_manager import FileManager
+
 class AlienInvasion():
     """Ogólna klasa przeznaczona do zarządzania zasobami i
     sposobem działania gry."""
@@ -38,6 +40,9 @@ class AlienInvasion():
 
         # Utworzenie przycisku Gra.
         self.play_button = Button(self, "Gra")
+
+        # Creating the file manager.
+        self.file_manager = FileManager()
 
     def run_game(self):
         """Rozpoczęcie pętli głównej gry."""
@@ -191,6 +196,7 @@ class AlienInvasion():
             # Pauza.
             sleep(0.5)
         else:
+            self.file_manager.save_data(self.stats.score)
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
 
