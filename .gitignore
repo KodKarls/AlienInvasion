@@ -1,5 +1,11 @@
-# Ustawienia programu Visual Studio Code
-.vscode/
+# PyCharm files
+.idea/
 
-# Pliki konsolidacji plików pythona
+# __pycache__ files
 __pycache__
+
+# Virtual environment files
+venv/
+
+# Build folder
+bin/
