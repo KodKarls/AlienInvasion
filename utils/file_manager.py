@@ -10,13 +10,13 @@ class FileManager:
         self.best_score = 0
 
     def save_data(self, score):
-        """Saving the best score into the file."""
+        """Save the best score into the file."""
 
-        # Checking if a new record has been set.
+        # Check if a new record has been set.
         if score > int(self.best_score):
             self.best_score = score
 
-            # Preparation of data for saving.
+            # Prepare of data for saving.
             self.best_score = str(score)
 
             # Save the best score.
@@ -24,7 +24,7 @@ class FileManager:
                 file_object.write(self.best_score)
 
     def load_data(self):
-        """Loading the best score from the file."""
+        """Load the best score from the file."""
 
         try:
             with open(self.filename_path, 'r') as file_object:

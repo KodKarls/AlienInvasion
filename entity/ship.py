@@ -2,46 +2,50 @@ import pygame
 from pygame.sprite import Sprite
 
 class Ship(Sprite):
-    """Klasa przeznaczona do zarządzania statkiem kosmicznym."""
+    """A class designed to manage the player."""
 
     def __init__(self, alien_invasion_game):
-        """Inicjalizacja statku kosmicznego i jego położenie początkowe."""
+        """Initialize Ship content."""
+
         super().__init__()
+
         self.screen = alien_invasion_game.screen
         self.setting = alien_invasion_game.settings
         self.screen_rect = alien_invasion_game.screen.get_rect()
 
-        # Wczytanie obrazu statku kosmicznego i pobranie jego prostokąta.
+        # Loads the ship image and get its rectangle.
         self.image = pygame.image.load('images/ship.bmp')
         self.rect = self.image.get_rect()
 
-        # Każdy nowy statek kosmiczny pojawia się na dole ekranu.
+        # Set the ship to mid-bottom of the screen.
         self.rect.midbottom = self.screen_rect.midbottom
 
-        # Położenie poziome statku jest przechowywane w postaci liczby zmiennoprzecinkowej.
-        self.ship_x= float(self.rect.x)
+        # Use float point number to store ship position.
+        self.ship_x = float(self.rect.x)
 
-        # Opcje wskazujące na poruszanie się statku.
+        # Options that indicate the movement of the ship.
         self.moving_right = False
         self.moving_left = False
 
     def update(self, *args, **kwargs):
-        """Uaktualnienie położenia statku na podstawie opcji wskazującejna
-        na jego ruch."""
-        # Uaktuanienie wartości współrzędnej X statku, a nie jego prostokąta.
+        """Update the ship position."""
+
+        # Updating the value of the X coordinate of the ship, not its rectangle.
         if self.moving_right and self.rect.right < self.screen_rect.right:
             self.ship_x += self.setting.ship_speed
         if self.moving_left and self.rect.left > 0:
             self.ship_x -= self.setting.ship_speed
 
-        # Uaktualnienie obiektu rect na podstawie wartości self.x.
+        # Update rect object based on self.ship_x value.
         self.rect.x = self.ship_x
 
-    def blitme(self):
-        """Wyświetlenie statku kosmicznego w jego aktualnym położeniu."""
+    def display(self):
+        """Display the ship."""
+
         self.screen.blit(self.image, self.rect)
 
     def center_ship(self):
-        """Umieszczenie statku na środku przy dolnej krawędzi ekranu."""
+        """Set the ship to mid-bottom of the screen."""
+
         self.rect.midbottom = self.screen_rect.midbottom
         self.ship_x = float(self.rect.x)

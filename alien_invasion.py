@@ -3,49 +3,49 @@ from time import sleep
 
 import pygame
 
-from settings import Settings
-from game_stats import GameStats
-from scoreboard import Scoreboard
-from button import Button
-from ship import Ship
-from bullet import Bullet
-from alien import Alien
-
+from utils.settings import Settings
+from utils.game_stats import GameStats
+from utils.scoreboard import Scoreboard
 from utils.file_manager import FileManager
+from gui.button import Button
+from entity.ship import Ship
+from entity.bullet import Bullet
+from entity.alien import Alien
 
-class AlienInvasion():
-    """Ogólna klasa przeznaczona do zarządzania zasobami i
-    sposobem działania gry."""
+class AlienInvasion:
+    """A class designed to manage all resources and the working way of the game."""
 
     def __init__(self):
-        """Inicjalizacja gry i utworzenie jej zasobów."""
+        """Initialize all game content."""
+
         pygame.init()
         self.settings = Settings()
 
+        # Screen settings.
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("Inwazja obcych")
 
-        # Utworzenie egzemplarza przechowującego dane statystyczne dotyczące gry
-        # oraz utworzenie egemplarza klasy Scoreboard.
+        # Create game stats object and scoreboard object.
         self.stats = GameStats(self)
         self.scoreboard = Scoreboard(self)
 
+        # Create entities.
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
-
         self._create_fleet()
 
-        # Utworzenie przycisku Gra.
+        # Create play button.
         self.play_button = Button(self, "Gra")
 
-        # Creating the file manager.
+        # Create file manager.
         self.file_manager = FileManager()
 
     def run_game(self):
-        """Rozpoczęcie pętli głównej gry."""
+        """Run the main loop game."""
+
         while True:
             self._check_events()
 
@@ -57,7 +57,8 @@ class AlienInvasion():
             self._update_screen()
 
     def _check_events(self):
-        """Reakcja na zdarzenia generowane przez klawiaturę i mysz."""
+        """React to events triggered by the keyboard and mouse."""
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -70,33 +71,34 @@ class AlienInvasion():
                 self._check_play_button(mouse_pos)
 
     def _check_play_button(self, mouse_pos):
-        """Rozpoczęcie nowej gry po kliknięciu przycisku Gra przez
-        użytkownika."""
+        """Start a new game when the user clicks the Game button."""
+
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
-            # Wyzerowanie ustawień dotyczących gry.
-            self.settings.initialize_dynamic_settings()
+            # Reset dynamic game settings.
+            self.settings.reset_dynamic_settings()
 
-            # Wyzerowanie danych statystycznych gry.
+            # Reset static game data.
             self.stats.reset_stats()
             self.stats.game_active = True
             self.scoreboard.prep_score()
             self.scoreboard.prep_level()
             self.scoreboard.prep_ships()
 
-            # Usunięcie zawartości list aliens i bullets.
+            # Remove contents from alien and bullet list.
             self.aliens.empty()
             self.bullets.empty()
 
-            # Utworzenie nowej floty i wyśrodkowanie statku
+            # Create the new aliens fleet and center the ship.
             self._create_fleet()
             self.ship.center_ship()
 
-            # Ukrycie kursora myszy.
+            # Hide the mouse cursor.
             pygame.mouse.set_visible(False)
 
     def _check_keydown_events(self, event):
-        """Reakcja na naciśnięcie klawisza."""
+        """React to press the key."""
+
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = True
         elif event.key == pygame.K_LEFT:
@@ -107,25 +109,26 @@ class AlienInvasion():
             self._fire_bullet()
 
     def _check_keyup_events(self, event):
-        """Reakcja na zwolnienie klawisza."""
+        """React to release the key."""
+
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
 
     def _fire_bullet(self):
-        """Utworzenie nowego pocisku i dodanie go do grupy pocisków."""
+        """Create a new bullet and add it to bullet groups."""
+
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
 
     def _update_bullets(self):
-        """Uaktualnienie położenia pocisków i usunięcie tych niewidocznych
-        na ekranie."""
-        # Uaktualnienie położenia pocisków.
+        """Update bullets position."""
+
         self.bullets.update()
 
-        # Usinięcie pocisków, które znajdują się poza ekraniem.
+        # Remove bullets, which are out of the screen.
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
@@ -133,9 +136,10 @@ class AlienInvasion():
         self._check_bullet_alien_collisions()
 
     def _check_bullet_alien_collisions(self):
-        """Reakcja na kolizję między pociskiem i obcym."""
-        # Usunięcie wszystkich pocisków i obcych, między którymi doszło do kolizji.
-        collisions = pygame.sprite.groupcollide( self.bullets, self.aliens, True, True )
+        """React for collision between a bullet and alien."""
+
+        # Remove all bullets and aliens, which collide with each other .
+        collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
         if collisions:
             for aliens in collisions.values():
@@ -144,56 +148,55 @@ class AlienInvasion():
             self.scoreboard.check_high_score()
 
         if not self.aliens:
-            # Usunięcie istniejących pocisków, przyśpieszenie gry i utworzenie nowej floty.
+            # Remove existing bullets, speed up the game and create a new alien fleet.
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
 
-            # Inkrementacja numeru poziomu.
+            # Update the game level.
             self.stats.level += 1
             self.scoreboard.prep_level()
 
     def _update_aliens(self):
-        """Sprawdzenie, czy flota obcych znajduje się przy krawędzi, a
-        następnie uaktualnienie położenia wszystkich obcych we flocie."""
+        """Update aliens fleet position."""
+
         self._check_fleet_edges()
         self.aliens.update()
 
-        # Wykrywanie kolizji między obcym i statkiem.
+        # Detect collision between alien and ship.
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             self._ship_hit()
 
-        # Wyszukiwanie obcych docierających do dolnej krawędzi ekranu.
+        # Find aliens, which achieve the bottom edge of the screen.
         self._check_aliens_bottom()
 
     def _check_aliens_bottom(self):
-        """Sprawdzenie, czy którykolwiek obcy dotarł do dolnej krawędzi
-        ekranu."""
+        """Check if any alien rich the bottom edge of the screen."""
+
         screen_rect = self.screen.get_rect()
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= screen_rect.bottom:
-                # Tak samo jak w przypadku zderzenia statku z obcym.
+                # The same as the case in collision alien with the ship.
                 self._ship_hit()
                 break
 
     def _ship_hit(self):
-        """Reakcja na uderzenie obcego w statek."""
+        """React for collision between the alien and the ship."""
 
         if self.stats.ships_left > 0:
-            # Zmniejszenie wartości przechowywanej w ships_left i
-            # uaktualnienie tablicy wyników.
+            # Decrease player lives and update scoreboard.
             self.stats.ships_left -= 1
             self.scoreboard.prep_ships()
 
-            # Usunięcie zawartości list aliens i bullets.
+            # Remove contents from alien and bullet list.
             self.aliens.empty()
             self.bullets.empty()
 
-            # Utworzenie nowej floty i wyśrodkowanie statku.
+            # Create the new aliens fleet and center the ship.
             self._create_fleet()
             self.ship.center_ship()
 
-            # Pauza.
+            # Pause a half second.
             sleep(0.5)
         else:
             self.file_manager.save_data(self.stats.score)
@@ -201,26 +204,28 @@ class AlienInvasion():
             pygame.mouse.set_visible(True)
 
     def _create_fleet(self):
-        """Utworzenie pełnej floty obcych."""
-        # Utworzenie obcego i ustalenie liczby obcych, którzy zmieszczą się w rzędzie.
-        # Odległość między poszczególnymi obcymi jest równa szerokości obcego.
+        """Create aliens fleet."""
+
+        # Create an alien and determine the number of aliens that will fit in a row. The distance between each alien is
+        # equal to the width of the alien.
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
         available_space_x = self.settings.screen_width - (2 * alien_width)
         number_aliens_x = available_space_x // (2 * alien_width)
 
-        # Ustalenie, ile rzędów obcych zmieści się na ekranie.
+        # Determine how many rows of aliens will fit on the screen.
         ship_height = self.ship.rect.height
         available_space_y = (self.settings.screen_height - (3 * alien_height) - ship_height)
         number_rows = available_space_y // (2 * alien_height)
 
-        # Utworzenie pełnej floty obcych.
+        # Create a complete aliens fleet.
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
                 self._create_alien(alien_number, row_number)
 
     def _create_alien(self, alien_number, row_number):
-        """Utworzenie obcego i umieszczenie go w rzędzie."""
+        """Create the alien and place it in the row."""
+
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
         alien.alien_x = alien_width + 2 * alien_width * alien_number
@@ -229,38 +234,41 @@ class AlienInvasion():
         self.aliens.add(alien)
 
     def _check_fleet_edges(self):
-        """Odpowiednia reakcja, gdy obcy dotrze do krawędzi ekranu."""
+        """React, when the alien rach the edge of the screen."""
+
         for alien in self.aliens.sprites():
             if alien.check_edges():
                 self._change_fleet_direction()
                 break
 
     def _change_fleet_direction(self):
-        """Przesunięcie całej floty w dół i zmiana kierunku, w którym się
-        ona porusza."""
+        """Move all aliens fleet to the bottom and change its direction."""
+
         for alien in self.aliens.sprites():
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
 
     def _update_screen(self):
-        """Uaktualnienie obrazów na ekranie i przejście do nowego ekranu."""
+        """Update all images on the screen."""
+
         self.screen.fill(self.settings.background_color)
-        self.ship.blitme()
+        self.ship.display()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
 
-        # Wyświetlenie informacji o punktacji.
-        self.scoreboard.show_score()
+        # Display all scoreboard data.
+        self.scoreboard.show_data()
 
-        # Wyświetlenie przycisku tylko wtedy, gdy gra jest nieaktywna
+        # Display the play button, when the game is disabled.
         if not self.stats.game_active:
             self.play_button.draw_button()
 
-        # Wyświetlenie ostatnio zmodyfikowanego ekranu.
+        # Display the last modified screen.
         pygame.display.flip()
 
+
 if __name__ == '__main__':
-    # Utworzenie egzemplarza gry i jej uruchomienie.
+    # Create the instance of the game and run it.
     alien_invasion = AlienInvasion()
     alien_invasion.run_game()
