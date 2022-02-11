@@ -3,7 +3,7 @@ import pygame.font
 class Button:
     """A class to manage buttons."""
 
-    def __init__(self, alien_invasion_game, msg):
+    def __init__(self, alien_invasion_game, width, height, pos_y, msg):
         """Initialize Button content."""
 
         self.screen = alien_invasion_game.screen
@@ -11,14 +11,16 @@ class Button:
         self.settings = alien_invasion_game.settings
 
         # Define the dimensions and properties of the button.
-        self.width, self.height = 200, 50
+        self.width, self.height = width, height
+        self.pos_y = pos_y
         self.button_color = (0, 255, 0)
         self.text_color = (255, 255, 255)
         self.font = pygame.font.SysFont(self.settings.font_name, self.settings.font_button_size)
 
         # Create a button rectangle and center it.
         self.rect = pygame.Rect(0, 0, self.width, self.height)
-        self.rect.center = self.screen_rect.center
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.centery = self.screen_rect.centery + 120 - self.pos_y
 
         # Prepare message - only once.
         self._prep_msg(msg)

@@ -37,8 +37,9 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
 
-        # Create play button.
-        self.play_button = Button(self, "Gra")
+        # Create play and exit button.
+        self.play_button = Button(self, 200, 50, 160, "Graj")
+        self.exit_button = Button(self, 200, 50, 80, "Wyjście")
 
         # Create file manager.
         self.file_manager = FileManager()
@@ -69,9 +70,10 @@ class AlienInvasion:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
+                self._check_exit_button(mouse_pos)
 
     def _check_play_button(self, mouse_pos):
-        """Start a new game when the user clicks the Game button."""
+        """Start a new game when the user clicks the play button."""
 
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
@@ -95,6 +97,13 @@ class AlienInvasion:
 
             # Hide the mouse cursor.
             pygame.mouse.set_visible(False)
+
+    def _check_exit_button(self, mouse_pos):
+        """Exit the game when the user clicks the exit button."""
+
+        button_clicked = self.exit_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active:
+            sys.exit(0)
 
     def _check_keydown_events(self, event):
         """React to press the key."""
@@ -260,9 +269,10 @@ class AlienInvasion:
         # Display all scoreboard data.
         self.scoreboard.show_data()
 
-        # Display the play button, when the game is disabled.
+        # Display buttons only if the game is inactive.
         if not self.stats.game_active:
             self.play_button.draw_button()
+            self.exit_button.draw_button()
 
         # Display the last modified screen.
         pygame.display.flip()
