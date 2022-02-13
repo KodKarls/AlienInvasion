@@ -74,6 +74,9 @@ class Scoreboard:
     def prep_ships(self):
         """Prepare images of the remaining ship lives."""
 
+        # Clear the previous lives images.
+        self.ships.empty()
+
         for ship_number in range(self.stats.ships_left):
             ship = Ship(self.alien_invasion_game)
             ship.rect.x = 10 + ship_number * ship.rect.width
