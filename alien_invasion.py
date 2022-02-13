@@ -69,7 +69,7 @@ class AlienInvasion:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
-            if event.type == self.playlist.next_song_event:
+            if event.type == self.playlist.next_song_event and self.stats.game_active:
                 self._play_next_song()
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
