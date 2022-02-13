@@ -14,7 +14,7 @@ class Ship(Sprite):
         self.screen_rect = alien_invasion_game.screen.get_rect()
 
         # Loads the ship image and get its rectangle.
-        self.image = pygame.image.load('images/ship.bmp')
+        self.image = pygame.image.load('res/images/ship.bmp')
         self.rect = self.image.get_rect()
 
         # Set the ship to mid-bottom of the screen.

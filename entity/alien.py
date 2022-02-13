@@ -13,7 +13,7 @@ class Alien(Sprite):
         self.settings = alien_invasion_game.settings
 
         # Loads the alien image and get its rectangle.
-        self.image = pygame.image.load('images/alien.bmp')
+        self.image = pygame.image.load('res/images/alien.bmp')
         self.rect = self.image.get_rect()
 
         # Set the alien to near the top left corner of the screen.
