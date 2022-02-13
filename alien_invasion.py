@@ -50,6 +50,16 @@ class AlienInvasion:
         self.playlist.load_song()
         self.playlist.set_song_end_event()
 
+        # Create the sounds.
+        self.shoot_sound = pygame.mixer.Sound('res/sounds/short-laser-gun-shot.wav')
+        self.explosion_sound = pygame.mixer.Sound('res/sounds/short-explosion.wav')
+        self.dead_sound = pygame.mixer.Sound('res/sounds/dead_sound.wav')
+
+        # Set volume of sounds.
+        self.shoot_sound.set_volume(0.15)
+        self.explosion_sound.set_volume(0.15)
+        self.dead_sound.set_volume(0.30)
+
     def run_game(self):
         """Run the main loop game."""
 
@@ -126,6 +136,7 @@ class AlienInvasion:
         elif event.key == pygame.K_q:
             sys.exit()
         elif event.key == pygame.K_SPACE:
+            self.shoot_sound.play()
             self._fire_bullet()
 
     def _check_keyup_events(self, event):
@@ -171,6 +182,7 @@ class AlienInvasion:
         if collisions:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
+                self.explosion_sound.play()
             self.scoreboard.prep_score()
             self.scoreboard.check_high_score()
 
@@ -211,6 +223,12 @@ class AlienInvasion:
         """React for collision between the alien and the ship."""
 
         if self.stats.ships_left > 0:
+            # Pause the current song.
+            self.playlist.pause_song()
+
+            # Play dead sound.
+            self.dead_sound.play()
+
             # Decrease player lives and update scoreboard.
             self.stats.ships_left -= 1
             self.scoreboard.prep_ships()
@@ -225,8 +243,12 @@ class AlienInvasion:
 
             # Pause a half second.
             sleep(0.5)
+
+            # Resume the current song.
+            self.playlist.resume_song()
         else:
             self.file_manager.save_data(self.stats.score)
+            self.dead_sound.play()
             self.playlist.stop_song()
             self.stats.game_active = False
             pygame.mouse.set_visible(True)

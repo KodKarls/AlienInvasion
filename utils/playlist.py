@@ -36,6 +36,18 @@ class Playlist:
         pygame.mixer.music.play()
 
     @staticmethod
+    def pause_song():
+        """Pause the current song from the playlist."""
+
+        pygame.mixer.music.pause()
+
+    @staticmethod
+    def resume_song():
+        """Resume the current song from the playlist."""
+
+        pygame.mixer.music.unpause()
+
+    @staticmethod
     def stop_song():
         """Stop playing the current song from the playlist."""
 
