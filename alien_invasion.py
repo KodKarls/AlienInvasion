@@ -7,6 +7,7 @@ from utils.settings import Settings
 from utils.game_stats import GameStats
 from utils.scoreboard import Scoreboard
 from utils.file_manager import FileManager
+from utils.playlist import Playlist
 from gui.button import Button
 from entity.ship import Ship
 from entity.bullet import Bullet
@@ -44,6 +45,11 @@ class AlienInvasion:
         # Create file manager.
         self.file_manager = FileManager()
 
+        # Create the playlist, load the first song and set next event after current song ends.
+        self.playlist = Playlist('res/music/')
+        self.playlist.load_song()
+        self.playlist.set_song_end_event()
+
     def run_game(self):
         """Run the main loop game."""
 
@@ -63,6 +69,8 @@ class AlienInvasion:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            if event.type == self.playlist.next_song_event:
+                self._play_next_song()
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
@@ -95,6 +103,9 @@ class AlienInvasion:
             self._create_fleet()
             self.ship.center_ship()
 
+            # Play the song from playlist.
+            self.playlist.play_song()
+
             # Hide the mouse cursor.
             pygame.mouse.set_visible(False)
 
@@ -124,6 +135,13 @@ class AlienInvasion:
             self.ship.moving_right = False
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
+
+    def _play_next_song(self):
+        """Play the next song from the playlist."""
+
+        self.playlist.set_next_song()
+        self.playlist.load_song()
+        self.playlist.play_song()
 
     def _fire_bullet(self):
         """Create a new bullet and add it to bullet groups."""
@@ -209,6 +227,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.file_manager.save_data(self.stats.score)
+            self.playlist.stop_song()
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
 
