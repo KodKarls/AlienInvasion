@@ -13,6 +13,7 @@ from entity.ship import Ship
 from entity.bullet import Bullet
 from entity.alien import Alien
 
+
 class AlienInvasion:
     """A class designed to manage all resources and the working way of the game."""
 

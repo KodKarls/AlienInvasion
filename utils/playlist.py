@@ -1,5 +1,6 @@
 import pygame
 
+
 class Playlist:
     """A class designed to manage the music playlist."""
 

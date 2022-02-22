@@ -1,5 +1,6 @@
 from utils.file_manager import FileManager
 
+
 class GameStats:
     """A class to manage the game data stats."""
 
